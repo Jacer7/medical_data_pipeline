@@ -1,0 +1,256 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database - Stores pipeline metadata, intermediate data
+  postgres:
+    image: postgres:15-alpine
+    container_name: medical_pipeline_postgres
+    environment:
+      POSTGRES_DB: medical_pipeline
+      POSTGRES_USER: pipeline_user
+      POSTGRES_PASSWORD: pipeline_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    # ports:
+    #   - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d
+    networks:
+      - medical_pipeline_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pipeline_user -d medical_pipeline"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MinIO - S3-compatible object storage for files
+  minio:
+    image: minio/minio:latest
+    container_name: medical_pipeline_minio
+    ports:
+      - "9000:9000"      # API port
+      - "9001:9001"      # Console port
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - medical_pipeline_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis - Caching and task queuing
+  redis:
+    image: redis:7-alpine
+    container_name: medical_pipeline_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - medical_pipeline_network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Dagster Daemon - Background processes, scheduling
+  dagster_daemon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dagster
+    container_name: medical_pipeline_dagster_daemon
+    environment:
+      DAGSTER_HOME: /opt/dagster/dagster_home
+      DAGSTER_POSTGRES_USER: pipeline_user
+      DAGSTER_POSTGRES_PASSWORD: pipeline_password
+      DAGSTER_POSTGRES_DB: medical_pipeline
+      DAGSTER_POSTGRES_HOST: postgres
+      DAGSTER_POSTGRES_PORT: 5432
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    command: dagster-daemon run
+    volumes:
+      - ./src:/opt/dagster/app
+      - ./dagster_home:/opt/dagster/dagster_home
+      - ./data:/opt/dagster/data
+      - ./output:/opt/dagster/output
+    networks:
+      - medical_pipeline_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Dagster Webserver - UI and API
+  dagster_webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dagster
+    container_name: medical_pipeline_dagster_webserver
+    ports:
+      - "3000:3000"
+    environment:
+      DAGSTER_HOME: /opt/dagster/dagster_home
+      DAGSTER_POSTGRES_USER: pipeline_user
+      DAGSTER_POSTGRES_PASSWORD: pipeline_password
+      DAGSTER_POSTGRES_DB: medical_pipeline
+      DAGSTER_POSTGRES_HOST: postgres
+      DAGSTER_POSTGRES_PORT: 5432
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    command: dagster-webserver -h 0.0.0.0 -p 3000 --workspace /opt/dagster/dagster_home/workspace.yaml
+    volumes:
+      - ./src:/opt/dagster/app
+      - ./dagster_home:/opt/dagster/dagster_home
+      - ./data:/opt/dagster/data
+      - ./output:/opt/dagster/output
+    networks:
+      - medical_pipeline_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      dagster_daemon:
+        condition: service_started
+    restart: unless-stopped
+
+  # Data Pipeline Worker - Main processing service
+  # pipeline_worker:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: pipeline
+  #   container_name: medical_pipeline_worker
+  #   environment:
+  #     POSTGRES_USER: pipeline_user
+  #     POSTGRES_PASSWORD: pipeline_password
+  #     POSTGRES_DB: medical_pipeline
+  #     POSTGRES_HOST: postgres
+  #     POSTGRES_PORT: 5432
+  #     MINIO_ENDPOINT: minio:9000
+  #     MINIO_ACCESS_KEY: minioadmin
+  #     MINIO_SECRET_KEY: minioadmin123
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     PYTHONPATH: /app
+  #   volumes:
+  #     - ./src:/app
+  #     - ./data:/app/data
+  #     - ./output:/app/output
+  #     - ./logs:/app/logs
+  #   networks:
+  #     - medical_pipeline_network
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     minio:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+  #   # Keep container running for manual execution or can be used for scheduled jobs
+  #   command: tail -f /dev/null
+
+  # # Analytics API - Ad-hoc queries and analytics endpoints
+  # analytics_api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: analytics
+  #   container_name: medical_pipeline_analytics
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     POSTGRES_USER: pipeline_user
+  #     POSTGRES_PASSWORD: pipeline_password
+  #     POSTGRES_DB: medical_pipeline
+  #     POSTGRES_HOST: postgres
+  #     POSTGRES_PORT: 5432
+  #     MINIO_ENDPOINT: minio:9000
+  #     MINIO_ACCESS_KEY: minioadmin
+  #     MINIO_SECRET_KEY: minioadmin123
+  #     FLASK_ENV: development
+  #     FLASK_DEBUG: 1
+  #   volumes:
+  #     - ./analytics:/app
+  #     - ./output:/app/output
+  #   networks:
+  #     - medical_pipeline_network
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+
+  # # Jupyter Notebook - Data exploration and development
+  # jupyter:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: jupyter
+  #   container_name: medical_pipeline_jupyter
+  #   ports:
+  #     - "8888:8888"
+  #   environment:
+  #     JUPYTER_ENABLE_LAB: "yes"
+  #     JUPYTER_TOKEN: "medical_pipeline_token"
+  #     POSTGRES_USER: pipeline_user
+  #     POSTGRES_PASSWORD: pipeline_password
+  #     POSTGRES_DB: medical_pipeline
+  #     POSTGRES_HOST: postgres
+  #     POSTGRES_PORT: 5432
+  #   volumes:
+  #     - ./notebooks:/home/jovyan/work
+  #     - ./src:/home/jovyan/work/src
+  #     - ./data:/home/jovyan/work/data
+  #     - ./output:/home/jovyan/work/output
+  #   networks:
+  #     - medical_pipeline_network
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+
+  # # Monitoring - Simple health check and metrics
+  # monitoring:
+  #   image: nginx:alpine
+  #   container_name: medical_pipeline_monitoring
+  #   ports:
+  #     - "8080:80"
+  #   volumes:
+  #     - ./monitoring/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./monitoring/dashboard.html:/usr/share/nginx/html/index.html
+  #   networks:
+  #     - medical_pipeline_network
+  #   restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  medical_pipeline_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

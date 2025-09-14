@@ -1,0 +1,69 @@
+2025-09-14 20:17:24 +0000 - dagster - DEBUG - __ASSET_JOB - 3a9ce799-9694-4c87-92e0-35ba5cf372fc - 659 - LOGS_CAPTURED - Started capturing logs in process (pid: 659).
+2025-09-14 20:17:24 +0000 - dagster - DEBUG - __ASSET_JOB - 3a9ce799-9694-4c87-92e0-35ba5cf372fc - 659 - raw_pubmed_json_data - STEP_START - Started execution of step "raw_pubmed_json_data".
+JSON parsing failed at line 32, column 1
+JSON parsing failed at line 32, column 1
+JSON parsing failed at line 32, column 1
+2025-09-14 20:17:32 +0000 - dagster - ERROR - __ASSET_JOB - 3a9ce799-9694-4c87-92e0-35ba5cf372fc - 659 - raw_pubmed_json_data - STEP_FAILURE - Execution of step "raw_pubmed_json_data" failed.
+
+dagster._core.errors.DagsterExecutionStepExecutionError: Error occurred while executing op "raw_pubmed_json_data"::
+
+tenacity.RetryError: RetryError[<Future at 0xffff90920990 state=finished raised ValueError>]
+
+Stack Trace:
+  File "/usr/local/lib/python3.11/site-packages/dagster/_core/execution/plan/utils.py", line 54, in op_execution_error_boundary
+    yield
+  File "/usr/local/lib/python3.11/site-packages/dagster/_utils/__init__.py", line 465, in iterate_with_context
+    next_output = next(iterator)
+                  ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/dagster/_core/execution/plan/compute_generator.py", line 131, in _coerce_op_compute_fn_to_iterator
+    result = invoke_compute_fn(
+             ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/dagster/_core/execution/plan/compute_generator.py", line 125, in invoke_compute_fn
+    return fn(context, **args_to_pass) if context_arg_provided else fn(**args_to_pass)
+                                                                    ^^^^^^^^^^^^^^^^^^
+  File "/opt/dagster/app/dagster_pipeline/assets.py", line 29, in raw_pubmed_json_data
+    json_data = reader.read_json("pubmed.json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/tenacity/__init__.py", line 289, in wrapped_f
+    return self(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/tenacity/__init__.py", line 379, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/tenacity/__init__.py", line 326, in iter
+    raise retry_exc from fut.exception()
+
+The above exception was caused by the following exception:
+ValueError: Invalid JSON in pubmed.json: Expecting value: line 32 column 1 (char 1341)
+
+Stack Trace:
+  File "/usr/local/lib/python3.11/site-packages/tenacity/__init__.py", line 382, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/opt/dagster/app/data_ingestion/file_readers.py", line 73, in read_json
+    raise ValueError(f"Invalid JSON in {filename}: {e}")
+
+The above exception occurred during handling of the following exception:
+json.decoder.JSONDecodeError: Expecting value: line 32 column 1 (char 1341)
+
+Stack Trace:
+  File "/opt/dagster/app/data_ingestion/file_readers.py", line 63, in read_json
+    data = json.loads(content)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+
+The above exception occurred during handling of the following exception:
+StopIteration: 1341
+
+Stack Trace:
+  File "/usr/local/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+

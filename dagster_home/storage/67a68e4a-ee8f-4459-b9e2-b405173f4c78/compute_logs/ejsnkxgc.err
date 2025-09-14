@@ -1,0 +1,8 @@
+2025-09-14 20:12:49 +0000 - dagster - DEBUG - __ASSET_JOB - 67a68e4a-ee8f-4459-b9e2-b405173f4c78 - 1012 - LOGS_CAPTURED - Started capturing logs in process (pid: 1012).
+2025-09-14 20:12:49 +0000 - dagster - DEBUG - __ASSET_JOB - 67a68e4a-ee8f-4459-b9e2-b405173f4c78 - 1012 - raw_pubmed_csv_data - STEP_START - Started execution of step "raw_pubmed_csv_data".
+Found 1 invalid dates in PubMed data
+2025-09-14 20:12:49 +0000 - dagster - DEBUG - __ASSET_JOB - 67a68e4a-ee8f-4459-b9e2-b405173f4c78 - 1012 - raw_pubmed_csv_data - STEP_OUTPUT - Yielded output "result" of type "DataFrame". (Type check passed).
+2025-09-14 20:12:49 +0000 - dagster - DEBUG - __ASSET_JOB - 67a68e4a-ee8f-4459-b9e2-b405173f4c78 - raw_pubmed_csv_data - Writing file at: /opt/dagster/dagster_home/storage/raw_pubmed_csv_data using PickledObjectFilesystemIOManager...
+2025-09-14 20:12:49 +0000 - dagster - DEBUG - __ASSET_JOB - 67a68e4a-ee8f-4459-b9e2-b405173f4c78 - 1012 - raw_pubmed_csv_data - ASSET_MATERIALIZATION - Materialized value raw_pubmed_csv_data.
+2025-09-14 20:12:49 +0000 - dagster - DEBUG - __ASSET_JOB - 67a68e4a-ee8f-4459-b9e2-b405173f4c78 - 1012 - raw_pubmed_csv_data - HANDLED_OUTPUT - Handled output "result" using IO manager "io_manager"
+2025-09-14 20:12:49 +0000 - dagster - DEBUG - __ASSET_JOB - 67a68e4a-ee8f-4459-b9e2-b405173f4c78 - 1012 - raw_pubmed_csv_data - STEP_SUCCESS - Finished execution of step "raw_pubmed_csv_data" in 40ms.
