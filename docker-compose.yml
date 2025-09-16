@@ -6,15 +6,15 @@ services:
     image: postgres:15-alpine
     container_name: medical_pipeline_postgres
     environment:
-      POSTGRES_DB: medical_pipeline
+      POSTGRES_DB: dagster_backend
       POSTGRES_USER: pipeline_user
       POSTGRES_PASSWORD: pipeline_password
       POSTGRES_HOST_AUTH_METHOD: trust
-    # ports:
-    #   - "5433:5432"
+    ports:
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./sql/init:/docker-entrypoint-initdb.d
+      - ./sql/init:/docker-entrypoint-initdb.d  # This will run create_databases.sql
     networks:
       - medical_pipeline_network
     healthcheck:
@@ -44,23 +44,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # Redis - Caching and task queuing
-  redis:
-    image: redis:7-alpine
-    container_name: medical_pipeline_redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - medical_pipeline_network
-    command: redis-server --appendonly yes
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   # Dagster Daemon - Background processes, scheduling
   dagster_daemon:
     build:
@@ -72,7 +55,7 @@ services:
       DAGSTER_HOME: /opt/dagster/dagster_home
       DAGSTER_POSTGRES_USER: pipeline_user
       DAGSTER_POSTGRES_PASSWORD: pipeline_password
-      DAGSTER_POSTGRES_DB: medical_pipeline
+      DAGSTER_POSTGRES_DB: dagster_backend
       DAGSTER_POSTGRES_HOST: postgres
       DAGSTER_POSTGRES_PORT: 5432
       MINIO_ENDPOINT: minio:9000
@@ -108,7 +91,7 @@ services:
       DAGSTER_HOME: /opt/dagster/dagster_home
       DAGSTER_POSTGRES_USER: pipeline_user
       DAGSTER_POSTGRES_PASSWORD: pipeline_password
-      DAGSTER_POSTGRES_DB: medical_pipeline
+      DAGSTER_POSTGRES_DB: dagster_backend
       DAGSTER_POSTGRES_HOST: postgres
       DAGSTER_POSTGRES_PORT: 5432
       MINIO_ENDPOINT: minio:9000
@@ -130,6 +113,23 @@ services:
       dagster_daemon:
         condition: service_started
     restart: unless-stopped
+
+  # Redis - Caching and task queuing
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: medical_pipeline_redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - medical_pipeline_network
+  #   command: redis-server --appendonly yes
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
 
   # Data Pipeline Worker - Main processing service
   # pipeline_worker:

@@ -1,22 +1,20 @@
 from dagster import Definitions
 from .assets import (
-    raw_drugs_data, 
-    raw_pubmed_csv_data, 
-    raw_clinical_trials_data,
-    consolidated_publications,
-    drug_mentions_extracted,
-    medical_graph_json,
-    save_medical_graph
+    ingest_drugs_batch,
+    ingest_pubmed_batch,
+    ingest_clinical_trials_batch,
+    ingestion_summary
 )
+from .setup_assets import setup_medical_database_job
 
 defs = Definitions(
     assets=[
-        raw_drugs_data,
-        raw_pubmed_csv_data,
-        raw_clinical_trials_data,
-        consolidated_publications,
-        drug_mentions_extracted,
-        medical_graph_json,
-        save_medical_graph
+        ingest_drugs_batch,
+        ingest_pubmed_batch,
+        ingest_clinical_trials_batch,
+        ingestion_summary
+    ],
+    jobs=[
+        setup_medical_database_job  # Run this once manually
     ]
 )
