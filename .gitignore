@@ -54,3 +54,5 @@ docker-compose.override.yml
 !output/.gitkeep
 !logs/.gitkeep
 !data/.gitkeep
+
+.claude

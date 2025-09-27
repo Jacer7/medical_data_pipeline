@@ -1,4 +1,5 @@
-# requirements/base.txt
-pandas==2.1.4
-requests==2.31.0
+# Base dependencies for all services
 python-dotenv==1.0.0
+pyyaml==6.0.1
+requests==2.31.0
+loguru==0.7.2

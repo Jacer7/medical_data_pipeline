@@ -67,7 +67,7 @@ RUN mkdir -p /opt/dagster/dagster_home \
 COPY dagster_home/ /opt/dagster/dagster_home/
 
 # Copy source code
-COPY src/ /opt/dagster/app/
+COPY medical_data_platform/ /opt/dagster/app/medical_data_platform/
 
 # Set Dagster-specific environment variables
 ENV DAGSTER_HOME=/opt/dagster/dagster_home

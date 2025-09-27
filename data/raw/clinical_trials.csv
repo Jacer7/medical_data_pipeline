@@ -1,9 +1,9 @@
-id,scientific_title,date,journal
-NCT01967433,"Use of Diphenhydramine as an Adjunctive Sedative for Colonoscopy in Patients Chronically on Opioids","1 January 2020","Journal of emergency nursing"
-NCT04189588,"Phase 2 Study IV QUZYTTIR™ (Cetirizine Hydrochloride Injection) vs V Diphenhydramine","1 January 2020","Journal of emergency nursing"
-NCT04237090,"  ","1 January 2020","Journal of emergency nursing"
-NCT04237091,"Feasibility of a Randomized Controlled Clinical Trial Comparing the Use of Cetirizine to Replace Diphenhydramine in the Prevention of Reactions Related to Paclitaxel","1 January 2020","Journal of emergency nursing"
-NCT04153396,"Preemptive Infiltration With Betamethasone and Ropivacaine for Postoperative Pain in Laminoplasty or \xc3\xb1 Laminectomy","1 January 2020","Hôpitaux Universitaires de Genève"
-NCT03490942,"Glucagon Infusion in T1D Patients With Recurrent Severe Hypoglycemia: Effects on Counter-Regulatory Responses",25/05/2020,""
-"","Glucagon Infusion in T1D Patients With Recurrent Severe Hypoglycemia: Effects on Counter-Regulatory Responses",25/05/2020,"Journal of emergency nursing"
-NCT04188184,"Tranexamic Acid Versus Epinephrine During Exploratory Tympanotomy","27 April 2020","Journal of emergency nursing\xc3\x28"
+id,scientific_title,date,journal,created_at
+NCT01967433,"Use of Diphenhydramine as an Adjunctive Sedative for Colonoscopy in Patients Chronically on Opioids",01/01/2020,"Journal of emergency nursing",2025-09-27 10:00:00
+NCT04189588,"Phase 2 Study IV QUZYTTIR (Cetirizine Hydrochloride Injection) vs V Diphenhydramine",01/01/2020,"Journal of emergency nursing",2025-09-27 10:30:00
+NCT04237091,"Feasibility of a Randomized Controlled Clinical Trial Comparing the Use of Cetirizine to Replace Diphenhydramine",01/01/2020,"Journal of emergency nursing",2025-09-27 11:00:00
+NCT04153396,"Preemptive Infiltration With Betamethasone and Ropivacaine for Postoperative Pain in Laminoplasty",01/01/2020,"European Medical Journal",2025-09-27 11:30:00
+NCT03490942,"Glucagon Infusion in T1D Patients With Recurrent Severe Hypoglycemia: Effects on Counter-Regulatory Responses",01/05/2020,"Diabetes Research Journal",2025-09-27 12:00:00
+NCT04188184,"Tranexamic Acid Versus Epinephrine During Exploratory Tympanotomy",01/04/2020,"Journal of emergency nursing",2025-09-27 12:30:00
+NCT05123456,"Phase 3 Study of Tetracycline in Bacterial Infections",01/06/2020,"Antimicrobial Research",2025-09-27 13:00:00
+NCT05789012,"Effects of Epinephrine Auto-injectors in Emergency Treatment",01/07/2020,"Emergency Medicine Today",2025-09-27 13:30:00

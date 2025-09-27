@@ -1,6 +1,27 @@
+# Dagster Core and Extensions
 dagster==1.5.13
 dagster-webserver==1.5.13
 dagster-postgres==0.21.13
-pandas==2.1.4
+dagster-aws==0.21.13
+
+# Database
 psycopg2-binary==2.9.9
-tenacity==8.2.3
+sqlalchemy==2.0.23
+
+# Data Processing
+pandas==2.1.4
+numpy==1.25.2
+
+# Machine Learning
+scikit-learn==1.3.2
+
+# Cloud Storage
+boto3==1.34.4
+minio==7.2.0
+
+# Utilities
+requests==2.31.0
+pyyaml==6.0.1
+
+# Logging
+loguru==0.7.2
